@@ -1,0 +1,60 @@
+# Disela — Android debug APK build (GitHub Actions).
+#
+# Why this exists: Disela was authored in a VM with no Android SDK and
+# almost no free RAM, so a local Gradle build there is not a realistic
+# path to a testable APK. This workflow builds the debug APK in the
+# cloud on every push to main and on pull requests, using the standard
+# Android CI setup (JDK 17 + Android SDK + Gradle).
+#
+# It deliberately does NOT use ./gradlew: the gradle-wrapper.jar is not
+# committed in this repo (see gradle/wrapper/gradle-wrapper.properties).
+# Instead it installs Gradle via gradle/actions/setup-gradle and runs
+# `gradle assembleDebug`. If a wrapper is added later, switch the build
+# step to `./gradlew assembleDebug` and remove the setup-gradle step.
+#
+# The debug APK is uploaded as an artifact named "disela-debug-apk".
+# It is NOT signed for release and NOT published to Google Play.
+# Release signing (keystore, signing config, Play upload) is out of v1
+# scope and must be added deliberately, never with a keystore committed
+# to the repo.
+
+name: Android Debug APK
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: "8.7"
+
+      - name: Build debug APK
+        run: gradle assembleDebug --stacktrace
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: disela-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
