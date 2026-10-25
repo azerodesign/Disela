@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.workmanager)
+    // No WorkManager in v1: reminders use AlarmManager (see ReminderScheduler.kt),
+    // and androidx.work:workmanager-ktx:2.9.0 does not resolve from Google Maven,
+    // which broke the first Gradle build. Re-add it only when a real Worker lands.
     ksp(libs.androidx.room.compiler)
 }
