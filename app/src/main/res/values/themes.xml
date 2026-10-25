@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Minimal platform theme. All real styling is Material 3 Expressive in
+      Compose (ui/theme/Theme.kt). This style only exists so the Android
+      system has a window background before Compose draws the first frame.
+      No colours are invented here: the window background is the platform
+      default and Compose's MaterialTheme takes over immediately.
+    -->
+    <style name="Theme.Disela" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
