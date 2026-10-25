@@ -12,6 +12,14 @@
 # `gradle assembleDebug`. If a wrapper is added later, switch the build
 # step to `./gradlew assembleDebug` and remove the setup-gradle step.
 #
+# It deliberately does NOT use android-actions/setup-android either:
+# run #1 (2026-10-25, commit 313422b) failed in that step with
+# "Failed to find package 'tools'" / sdkmanager exit code 1 — the
+# obsolete 'tools' package no longer exists. ubuntu-latest runners
+# already ship an Android SDK, so this workflow only ensures the
+# exact platform/build-tools Disela needs (compileSdk/targetSdk 34)
+# are installed via the runner's own cmdline-tools sdkmanager.
+#
 # The debug APK is uploaded as an artifact named "disela-debug-apk".
 # It is NOT signed for release and NOT published to Google Play.
 # Release signing (keystore, signing config, Play upload) is out of v1
@@ -41,8 +49,15 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Ensure Android SDK packages
+        run: |
+          SDKMANAGER=""
+          for DIR in "$ANDROID_HOME/cmdline-tools/latest" "$ANDROID_HOME/cmdline-tools/16.0"; do
+            if [ -x "$DIR/bin/sdkmanager" ]; then SDKMANAGER="$DIR/bin/sdkmanager"; break; fi
+          done
+          if [ -z "$SDKMANAGER" ]; then echo "sdkmanager not found under \$ANDROID_HOME/cmdline-tools"; exit 1; fi
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
