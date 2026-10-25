@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!--
+      Minimal Disela foreground: a white disc with a gap (the "sela" /
+      gap in the middle of the day). This is a placeholder icon, not a
+      final brand mark — replace it when a proper Disela icon is designed.
+      It exists so the project actually builds: AndroidManifest references
+      @mipmap/ic_launcher, and a missing launcher icon is a build failure.
+    -->
+    <path
+        android:fillColor="@color/ic_launcher_foreground"
+        android:pathData="M54,54m-28,0a28,28 0,1,1 56,0a28,28 0,1,1 -56,0" />
+    <path
+        android:fillColor="@color/ic_launcher_background"
+        android:pathData="M54,34h8v40h-8z" />
+</vector>
